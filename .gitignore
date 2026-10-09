@@ -1,0 +1,21 @@
+# OS and Python artifacts
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local credentials and environment files
+.env
+.env.*
+!.env.example
+
+# Local audit history and generated paper outputs
+/AUDIT.md
+/audit/
+/output/
+/outputs/
+/source/
+/translation*.json
+/regions*.json
+*.pdf

@@ -1,0 +1,4 @@
+interface:
+  display_name: "论文中文对照阅读"
+  short_description: "完整翻译论文 PDF，生成可离线阅读的逐页中英对照 HTML 阅读稿"
+  default_prompt: "使用 $paper-translate-reader 阅读并翻译这篇论文，制作按原文页码排列的中文对照阅读稿。"

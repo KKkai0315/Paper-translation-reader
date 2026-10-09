@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'nonce-@@NONCE@@'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>@@TITLE@@</title>
+<style>
+:root { --ink:#24302d; --muted:#607066; --line:#d8e1da; --size:17px; }
+* { box-sizing:border-box; }
+body { margin:0; height:100dvh; display:flex; flex-direction:column; background:#edf2ee; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif; }
+header { flex:none; padding:15px 22px 12px; background:#f8faf8; border-bottom:1px solid var(--line); }
+h1 { font-size:21px; line-height:1.5; margin:0 0 5px; }
+.subtitle,.coverage,.hint { font-size:12px; color:var(--muted); line-height:1.6; }
+.coverage { margin-top:8px; }
+.toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+button,select,input { font:inherit; font-size:14px; border:1px solid #c7d4cb; border-radius:7px; background:#fff; color:var(--ink); padding:7px 10px; }
+button,select { cursor:pointer; }
+button:hover { background:#e7f0e9; }
+button:disabled { opacity:.4; cursor:default; }
+button:focus-visible,select:focus-visible,input:focus-visible,.scan:focus-visible { outline:2px solid #16825e; outline-offset:2px; }
+#page-select { max-width:min(310px,65vw); }
+#search { width:160px; }
+#indicator { font-size:13px; min-width:50px; text-align:center; }
+main { flex:1; min-height:0; padding:14px; }
+.spread { height:100%; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+[hidden] { display:none!important; }
+.panel { min-width:0; min-height:0; display:flex; flex-direction:column; background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.panel-label { flex:none; padding:10px 16px; border-bottom:1px solid var(--line); background:#f8faf8; color:var(--muted); font-size:12px; }
+.scan-scroll,.reading { min-height:0; overflow:auto; flex:1; }
+.scan { display:block; width:100%; cursor:zoom-in; }
+.scan.zoomed { width:170%; max-width:none; cursor:zoom-out; }
+.reading { padding:25px 30px 40px; font-size:var(--size); line-height:1.95; }
+.reading h2 { font-size:1.4em; line-height:1.5; color:#16543f; margin:0 0 20px; }
+.reading h3 { font-size:1.2em; line-height:1.5; margin:28px 0 15px; }
+.reading h4,.reading h5 { font-size:1.06em; margin:24px 0 12px; }
+p { margin:0 0 19px; white-space:pre-line; }
+.caption { color:#4c6055; font-size:.92em; }
+.figure { margin:24px 0; break-inside:avoid; }
+.figure-open { display:block; width:100%; padding:8px; background:white; cursor:zoom-in; }
+.figure-open:hover { background:#f8faf8; }
+.figure-image { display:block; width:100%; height:auto; }
+figcaption { margin-top:12px; white-space:pre-line; }
+.figure-hint { font-size:11px; color:var(--muted); margin-top:5px; }
+#figure-dialog { padding:0; border:1px solid var(--line); border-radius:12px; width:94vw; max-width:1600px; height:90dvh; max-height:90dvh; color:var(--ink); }
+#figure-dialog[open] { display:flex; flex-direction:column; }
+#figure-dialog::backdrop { background:#14241ccc; }
+.figure-dialog-toolbar { padding:12px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:12px; border-bottom:1px solid var(--line); }
+#figure-title { flex:1; }
+.figure-dialog-scroll { flex:1; min-height:0; overflow:auto; padding:16px; }
+#figure-full { display:block; max-width:100%; height:auto; margin:auto; }
+#figure-full.actual { max-width:none; margin:0; }
+#figure-caption { padding:12px 16px; margin:0; max-height:25%; overflow:auto; font-size:14px; line-height:1.7; }
+aside { margin:22px 0; padding:12px 16px; background:#f2f6f0; border-left:3px solid #a6b9aa; font-size:.88em; }
+pre { white-space:pre-wrap; overflow-wrap:anywhere; padding:18px; background:#f1f5f2; border-radius:6px; font:0.83em/1.8 ui-monospace,SFMono-Regular,monospace; }
+.equation { text-align:center; border:1px solid #dbe6dd; font-size:.98em; }
+.table-scroll { overflow:auto; margin:20px 0; }
+table { width:100%; min-width:420px; border-collapse:collapse; font-size:.8em; line-height:1.6; }
+th,td { padding:9px; border:1px solid #d9e2dc; text-align:left; }
+th { background:#edf3ee; }
+.page-end { margin-top:32px; border-top:1px solid var(--line); padding-top:18px; font-size:13px; color:var(--muted); }
+body[data-mode="translation"] .spread { grid-template-columns:minmax(0,940px); justify-content:center; }
+body[data-mode="translation"] .original { display:none; }
+body[data-mode="original"] .spread { grid-template-columns:minmax(0,1100px); justify-content:center; }
+body[data-mode="original"] .translation { display:none; }
+.results { position:fixed; z-index:5; top:15%; right:20px; width:min(480px,90vw); max-height:65dvh; overflow:auto; background:#fff; border:1px solid var(--line); border-radius:9px; box-shadow:0 8px 30px #0002; padding:14px; }
+.results-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.result { display:block; text-align:left; width:100%; margin:8px 0; line-height:1.6; }
+.match { background:#fff0bf; outline:2px solid #d8b35c; outline-offset:4px; }
+.hint { display:none; }
+@media(max-width:850px) {
+  header { padding:12px; } h1 { font-size:18px; } main { padding:8px; }
+  .toolbar,.spread { gap:7px; } .reading { padding:18px; } .panel-label { padding:8px; }
+}
+@media(max-width:600px) {
+  body[data-mode="split"] .spread { grid-template-columns:1fr; }
+  body[data-mode="split"] .original { display:none; }
+  .hint { display:block; margin-top:5px; } .subtitle { font-size:11px; }
+}
+@media print {
+  body,main { display:block!important; height:auto!important; background:#fff; padding:0; }
+  header,.original,.results,.page-end,#figure-dialog,.figure-hint { display:none!important; }
+  .figure-open { border:0; padding:0; }
+  .spread,.spread[hidden] { display:block!important; height:auto; break-before:page; }
+  .panel,.translation,.reading { display:block!important; overflow:visible; border:0; }
+  .reading { padding:10px 0; font-size:11pt; } .match { outline:none; background:none; }
+}
+</style>
+</head>
+<body data-mode="split">
+<header>
+<h1>@@TITLE@@</h1>
+<div class="subtitle">@@SUBTITLE@@</div>
+<div class="toolbar">
+<button id="prev" aria-label="上一页">←</button><span id="indicator" aria-live="polite"></span><button id="next" aria-label="下一页">→</button>
+<select id="page-select" aria-label="跳转页面">@@OPTIONS@@</select>
+<select id="mode" aria-label="阅读模式"><option value="split">中英对照</option><option value="translation">只看译文</option><option value="original">只看原文</option></select>
+<button id="smaller" aria-label="缩小译文字号">A−</button><button id="larger" aria-label="放大译文字号">A＋</button>
+<input id="search" type="search" placeholder="搜索全部译文" aria-label="搜索全部译文"><button id="search-button">搜索</button>
+</div>
+<div class="coverage">@@COVERAGE@@</div>
+<div class="hint">窄窗口下对照模式默认显示译文；通过“阅读模式”切换原文。</div>
+</header>
+<div id="results" class="results" hidden aria-label="搜索结果"></div>
+<main>@@SECTIONS@@</main>
+<dialog id="figure-dialog" aria-labelledby="figure-title">
+<div class="figure-dialog-toolbar"><strong id="figure-title">原图</strong><button id="figure-size" aria-pressed="false">原始像素</button><button id="figure-close" autofocus>关闭</button></div>
+<div class="figure-dialog-scroll"><img id="figure-full" alt=""></div>
+<p id="figure-caption"></p>
+</dialog>
+<script nonce="@@NONCE@@">
+'use strict';
+const byId = id => document.getElementById(id);
+const spreads = Array.from(document.querySelectorAll('.spread'));
+const count = spreads.length;
+const pageSelect = byId('page-select');
+const resultPanel = byId('results');
+const figureDialog = byId('figure-dialog');
+const figureFull = byId('figure-full');
+const figureSize = byId('figure-size');
+const searchIndex = spreads.map((spread, i) => ({
+  number:i+1,
+  blocks:Array.from(spread.querySelectorAll('.reading .block'))
+}));
+let current = 1;
+let fontSize = 17;
+
+function go(value) {
+  const n = Math.max(1, Math.min(count, Number.isFinite(value) ? Math.trunc(value) : 1));
+  spreads.forEach((spread,i) => { spread.hidden = i !== n-1; });
+  document.querySelectorAll('.match').forEach(el => el.classList.remove('match'));
+  current = n;
+  pageSelect.value = String(n);
+  byId('indicator').textContent = n + ' / ' + count;
+  byId('prev').disabled = n === 1;
+  byId('next').disabled = n === count;
+  resultPanel.hidden = true;
+  try { history.replaceState(null,'','#page-' + n); } catch (_) { /* Some file viewers restrict history. */ }
+}
+function changeFont(delta) {
+  fontSize = Math.max(13,Math.min(27,fontSize+delta));
+  document.documentElement.style.setProperty('--size', fontSize+'px');
+}
+function search() {
+  resultPanel.replaceChildren();
+  const query = byId('search').value.trim().toLocaleLowerCase();
+  if (!query) { resultPanel.hidden = true; return; }
+  const head = document.createElement('div');
+  head.className = 'results-head';
+  const title = document.createElement('strong');
+  title.textContent = '搜索结果';
+  const close = document.createElement('button');
+  close.textContent = '关闭';
+  close.addEventListener('click', () => { resultPanel.hidden = true; byId('search').focus(); });
+  head.append(title,close);
+  resultPanel.append(head);
+  let hits = 0;
+  for (const page of searchIndex) {
+    for (const block of page.blocks) {
+      const value = block.textContent;
+      const index = value.toLocaleLowerCase().indexOf(query);
+      if (index < 0) continue;
+      hits++;
+      const button = document.createElement('button');
+      button.className = 'result';
+      button.textContent = '第 '+page.number+' 页 · '+value.slice(Math.max(0,index-25),index+100);
+      button.addEventListener('click', () => {
+        if (document.body.dataset.mode === 'original') {
+          document.body.dataset.mode = 'translation'; byId('mode').value = 'translation';
+        }
+        go(page.number);
+        block.classList.add('match');
+        block.scrollIntoView({block:'center'});
+      });
+      resultPanel.append(button);
+    }
+  }
+  title.textContent = hits ? '搜索结果 · '+hits+' 处' : '未找到匹配文字';
+  resultPanel.hidden = false;
+}
+byId('prev').addEventListener('click', () => go(current-1));
+byId('next').addEventListener('click', () => go(current+1));
+pageSelect.addEventListener('change', () => go(Number(pageSelect.value)));
+byId('mode').addEventListener('change', e => { document.body.dataset.mode = e.target.value; });
+byId('smaller').addEventListener('click', () => changeFont(-1));
+byId('larger').addEventListener('click', () => changeFont(1));
+byId('search-button').addEventListener('click', search);
+byId('search').addEventListener('keydown', e => { if(e.key === 'Enter') search(); });
+document.querySelectorAll('.scan').forEach(img => {
+  img.tabIndex = 0;
+  img.addEventListener('click', () => img.classList.toggle('zoomed'));
+  img.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); img.classList.toggle('zoomed'); }
+  });
+});
+document.querySelectorAll('.figure-open').forEach(button => {
+  button.addEventListener('click', () => {
+    const img = button.querySelector('img');
+    figureFull.src = img.src;
+    figureFull.alt = img.alt;
+    figureFull.classList.remove('actual');
+    figureSize.textContent = '原始像素';
+    figureSize.setAttribute('aria-pressed', 'false');
+    byId('figure-title').textContent = button.dataset.label + ' · 原图';
+    byId('figure-caption').textContent = button.closest('figure').querySelector('figcaption').textContent;
+    figureDialog.showModal();
+    figureFull.parentElement.scrollTo(0, 0);
+  });
+});
+byId('figure-close').addEventListener('click', () => figureDialog.close());
+figureDialog.addEventListener('click', e => { if (e.target === figureDialog) figureDialog.close(); });
+figureSize.addEventListener('click', () => {
+  const actual = figureFull.classList.toggle('actual');
+  figureSize.textContent = actual ? '适应窗口' : '原始像素';
+  figureSize.setAttribute('aria-pressed', String(actual));
+});
+document.addEventListener('keydown', e => {
+  if (figureDialog.open) return;
+  if (e.key === 'Escape') { resultPanel.hidden = true; return; }
+  if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowRight') go(current+1);
+  if (e.key === 'ArrowLeft') go(current-1);
+});
+const initial = location.hash.match(/^#page-(\d+)$/);
+go(initial ? Number(initial[1]) : 1);
+</script>
+</body>
+</html>
