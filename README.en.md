@@ -18,9 +18,9 @@ A paper-reading skill for Codex. Give the agent a PDF; it reads the paper, trans
 - **One-file output**: pages, text, and images are embedded in HTML. Once generated, the reader needs no server or network connection.
 - **Traceable assets**: source PDF fingerprints and crop rectangles help validate page placement, image provenance, and file paths.
 
-![Reader demonstration using a synthetic two-page document](docs/assets/reader-preview.jpg)
+![Desktop split-view reader with original and translated pages side by side](docs/assets/reader-preview-desktop.jpg)
 
-*The screenshot uses a synthetic test document. Download the [demo HTML](examples/demo.html) and open it in a browser; GitHub's file view displays the HTML source.*
+*Desktop split view at 1440 × 800, using a synthetic test document. Download the [demo HTML](examples/demo.html) and open it in a browser; GitHub's file view displays the HTML source.*
 
 ## Getting started
 

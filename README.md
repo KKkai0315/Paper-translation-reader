@@ -18,9 +18,9 @@
 - **单文件交付**：页面、译文和图片都嵌入 HTML，生成后无需服务端或网络即可阅读。
 - **可追溯**：记录来源 PDF 指纹和图框，检查页码、图片来源与文件路径。
 
-![自制双页文档的阅读器演示](docs/assets/reader-preview.jpg)
+![桌面双栏阅读演示：原文与中文译文并排显示](docs/assets/reader-preview-desktop.jpg)
 
-*截图来自自制测试文档。可下载 [演示 HTML](examples/demo.html) 后在浏览器中打开；GitHub 文件页展示的是 HTML 源码。*
+*桌面双栏截图（1440 × 800），来自自制测试文档。可下载 [演示 HTML](examples/demo.html) 后在浏览器中打开；GitHub 文件页展示的是 HTML 源码。*
 
 ## 开始使用
 
